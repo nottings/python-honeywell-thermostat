@@ -21,3 +21,7 @@ with the customizations of this repo.
 
 This is an initail commit with basic working functionality. Still **LOTS** to do 
 especially with code cleanup.
+
+
+[[highstock.png]]
+[[pyplot.png]]
