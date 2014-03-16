@@ -4,20 +4,11 @@ from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import json
-import urllib2
 import urllib
 import datetime
 import re
 import time
-import math
-import base64
-import time
 import httplib
-import sys
-import tty,termios
-import getopt
-import os
-import stat
 
 # Login information for Total Connect Comfort web site
 USERNAME="your Total Connect Comfort login id"
@@ -34,7 +25,7 @@ DB_PASS = ''
 # grant all on thermostat.* to 'DB_USER'@'localhost' identified by 'DB_PASS';
 # flush privileges
 # Then,
-engine = create_engine('mysql://%s:%s@localhost:3306/thermostat' % (DB_USER, DB_PASS)
+engine = create_engine('mysql://%s:%s@localhost:3306/thermostat' % (DB_USER, DB_PASS))
 Base = declarative_base()
 
 class Data(Base):
