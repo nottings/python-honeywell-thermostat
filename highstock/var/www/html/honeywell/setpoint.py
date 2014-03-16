@@ -22,6 +22,15 @@ DBSession = sessionmaker()
 DBSession.bind = engine
 session = DBSession()
 
+db_data = []
+for x in session.query(Data).all():
+    if x.SystemSwitchPosition == 1:
+        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), x.HeatSetpoint ])
+    elif x.SystemSwitchPosition == 3:
+        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), x.CoolSetpoint ])
+    else:
+        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), 0 ])
 
-data = json.dumps([ [(int(x.Date.strftime("%s")) * 1000) - (3600000*5), x.HeatSetpoint ] for x in session.query(Data).all() ])
+data = json.dumps(db_data)
 print data
+
