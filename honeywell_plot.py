@@ -6,6 +6,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import matplotlib.pyplot as plt
 
+DB_USER = ""
+DB_PASS = ""
+
 engine = create_engine('mysql://%s:%s@localhost:3306/thermostat' % (DB_USER, DB_PASS))
 Base.metadata.bind = engine
 DBSession = sessionmaker()
