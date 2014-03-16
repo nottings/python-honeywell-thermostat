@@ -259,17 +259,22 @@ $(function() {
 
     var seriesOptions = [],
     seriesCounter = 0,
-    names = ['outdoortemp', 'setpoint', 'indoortemp', 'running'];
+    names = ['indoortemp', 'setpoint', 'outdoortemp', 'running'];
 
     $.each(names, function(i, name) {
 
         $.getJSON('./'+ name +'.py', function(data) {
             seriesOptions[i] = {
+                type: 'line',
                 name: name,
                 data: data,
 				marker : {
-					enabled : true,
-					radius : 2
+					enabled : false,
+                    states: {
+                        hover: {
+                            radius : 5
+                        }
+                    },
 				},
 				shadow : true,
 				tooltip : {
@@ -298,6 +303,20 @@ $(function() {
 			title : {
 				text : 'Home Temperatures'
 			},
+
+            legend : {
+                borderRadius: 0,
+                borderColor: 'silver',
+                enabled: true,
+                margin: 30,
+                itemMarginTop: 2,
+                itemMarginBottome: 2,
+                width: 600,
+                itemWidth:300,
+                itemStyle: {
+                     width:280
+                }
+            },
 
 			series : seriesOptions
 		});
