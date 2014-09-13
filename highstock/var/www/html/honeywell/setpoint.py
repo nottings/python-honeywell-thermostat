@@ -16,7 +16,7 @@ print
 DB_USER = "YOUR DB USER"
 DB_PASS = "YOUR DB PASS"
 
-engine = create_engine('mysql://%s:%s@localhost:3306/thermostat' % (DB_USER, DB_PASS)
+engine = create_engine('mysql://%s:%s@localhost:3306/thermostat' % (DB_USER, DB_PASS))
 Base.metadata.bind = engine
 DBSession = sessionmaker()
 DBSession.bind = engine
@@ -25,11 +25,11 @@ session = DBSession()
 db_data = []
 for x in session.query(Data).all():
     if x.SystemSwitchPosition == 1:
-        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), x.HeatSetpoint ])
+        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), x.HeatSetpoint])
     elif x.SystemSwitchPosition == 3:
-        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), x.CoolSetpoint ])
+        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), x.CoolSetpoint])
     else:
-        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), 0 ])
+        db_data.append([(int(x.Date.strftime("%s")) * 1000) - (3600000*5), 0])
 
 data = json.dumps(db_data)
 print data

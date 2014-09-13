@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-
-
 import forecastio
-import datetime
 import json
 import cgitb
 
@@ -21,6 +18,6 @@ lng = -87.683696
 forecast = forecastio.load_forecast(api_key, lat, lng)
 
 # TODO: adjust math to use GMT offset from forecast data instead of hard-coded "5"
-data = json.dumps([ [(int(x['time']) * 1000) - (3600000*5), x['temperature']] for x in forecast.__dict__['json']['hourly']['data'] ])
+data = json.dumps([[(int(x['time']) * 1000) - (3600000*5), x['temperature']] for x in forecast.__dict__['json']['hourly']['data']])
 
 print data
