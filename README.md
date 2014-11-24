@@ -5,8 +5,6 @@ Data collector for internet connected Honeywell Thermostats
 
 - **honeywell**_db.py Adds data collected from Total Connect Comfort site to a local 
 MySQL database 
-> Special thanks to Dustin S. (texnofobix) for figuring out how to connect and retrieve
-data after Honeywell changed their API on 9/1/2014
 
 - **honeywell_plot.py** Simple PyPlot of temperature data from database
 
