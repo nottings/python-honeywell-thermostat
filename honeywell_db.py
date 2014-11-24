@@ -3,8 +3,13 @@
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import json
+import urllib
 import datetime
 import time
+import re
+import time
+import httplib
 import requests
 
 
@@ -50,38 +55,37 @@ class Data(Base):
     StatusCool = Column(Integer())
     StatusHeat = Column(Integer())
     SystemSwitchPosition = Column(Integer())
-    TemporaryHoldUntilTime = Column(Integer())
-    #Humidity = Column(Integer())
-    #Phrase = Column(String(32))
-    #Temperature = Column(Integer())
+    #TemporaryHoldUntilTime = Column(Integer())
+    Humidity = Column(Integer())
+    Phrase = Column(String(32))
+    Temperature = Column(Integer())
 
 
     def __init__(self, data):
         self.Date = datetime.datetime.now()
-        self.CoolLowerSetptLimit = data['latestData']['uiData']['CoolLowerSetptLimit']
-        self.CoolNextPeriod = data['latestData']['uiData']['CoolNextPeriod']
-        self.CoolSetpoint = data['latestData']['uiData']['CoolSetpoint']
-        self.CoolUpperSetptLimit = data['latestData']['uiData']['CoolUpperSetptLimit']
-        self.DeviceID = data['latestData']['uiData']['DeviceID']
-        self.DispTemperature = data['latestData']['uiData']['DispTemperature']
-        self.DisplayedUnits = data['latestData']['uiData']['DisplayUnits']
-        self.HeatLowerSetptLimit = data['latestData']['uiData']['HeatLowerSetptLimit']
-        self.HeatNextPeriod = data['latestData']['uiData']['HeatNextPeriod']
-        self.HeatSetpoint = data['latestData']['uiData']['HeatSetpoint']
-        self.HeatUpperSetptLimit = data['latestData']['uiData']['HeatUpperSetptLimit']
-        self.IsInVacationHoldMode = data['latestData']['uiData']['IsInVacationHoldMode']
-        self.SchedCoolSp = data['latestData']['uiData']['ScheduleCoolSp']
-        self.SchedHeatSp = data['latestData']['uiData']['ScheduleHeatSp']
-        self.ScheduleCapable = data['latestData']['uiData']['ScheduleCapable']
+        self.CoolLowerSetptLimit = float(data['latestData']['uiData']['coolLowerSetpLimit'])
+        self.CoolNextPeriod = float(data['latestData']['uiData']['coolNextPeriod'])
+        self.CoolSetpoint = float(data['latestData']['uiData']['coolSetpoint'])
+        self.CoolUpperSetptLimit = float(data['latestData']['uiData']['coolUpperSetptLimit'])
+        self.DeviceID = int(data['latestData']['uiData']['deviceID'])
+        self.DispTemperature = float(data['latestData']['uiData']['dispTemperature'])
+        self.DisplayedUnits = data['latestData']['uiData']['displayedUnits']
+        self.HeatLowerSetptLimit = float(data['latestData']['uiData']['heatLowerSetptLimit'])
+        self.HeatNextPeriod = int(data['latestData']['uiData']['heatNextPeriod'])
+        self.HeatSetpoint = float(data['latestData']['uiData']['heatSetpoint'])
+        self.HeatUpperSetptLimit = float(data['latestData']['uiData']['heatUpperSetptLimit'])
+        self.IsInVacationHoldMode = bool(data['latestData']['uiData']['isInVacationHoldMode'])
+        self.SchedCoolSp = float(data['latestData']['uiData']['schedCoolSp'])
+        self.SchedHeatSp = float(data['latestData']['uiData']['schedHeatSp'])
+        self.ScheduleCapable = bool(data['latestData']['uiData']['scheduleCapable'])
         #self.StatSenseDispTemp = data['latestData']['uiData']['StatSenseDispTemp']
-        self.StatusCool = data['latestData']['uiData']['StatusCool']
-        self.StatusHeat = data['latestData']['uiData']['StatusHeat']
-        self.SystemSwitchPosition = data['latestData']['uiData']['SystemSwitchPosition']
-        self.TemporaryHoldUntilTime = data['latestData']['uiData']['TemporaryHoldUntilTime']
-        #self.Humidity = data['latestData']['weather']['OutdoorHumidity']
-        #self.Phrase = data['latestData']['weather']['Phrase']
-        #self.Temperature = data['latestData']['weather']['Temperature']
-
+        self.StatusCool = int(data['latestData']['uiData']['statusCool'])
+        self.StatusHeat = int(data['latestData']['uiData']['statusHeat'])
+        self.SystemSwitchPosition = int(data['latestData']['uiData']['systemSwitchPosition'])
+        #self.TemporaryHoldUntilTime = int(data['latestData']['uiData']['vacationHoldUntilTime'])
+        self.Humidity = int(data['latestData']['uiData']['weatherHumidity'])
+        self.Phrase = data['latestData']['uiData']['weatherPhrase']
+        self.Temperature = int(data['latestData']['uiData']['weatherTemperature'])
 
 #Uncomment this to drop all previous data stored in DB
 # Erases all old data
@@ -124,18 +128,14 @@ def get_data():
     utc_seconds = int(utc_seconds*1000)
 
     # Login
-    r = s.post('https://rs.alarmnet.com/TotalConnectComfort', params=auth, headers=headers)
+    r = s.post('https://mytotalconnectcomfort.com/portal/', params=auth, headers=headers)
     r.raise_for_status()
-
-    # Validate
-    r = s.get('https://rs.alarmnet.com/TotalConnectComfort/Device/Control/' + DEVICE_ID, headers=headers)
-    r.raise_for_status()
-
-    # Get Status
-    r = s.get('https://rs.alarmnet.com/TotalConnectComfort/Device/CheckDataSession/' + DEVICE_ID+'?_='+str(utc_seconds), headers=headers2)
-    r.raise_for_status()
-
-    return r.json()
+    data_regex = re.compile(r'Control\.Model\.set\(Control\.Model\.Property\.(.*),\ (.*)\);')
+    matches = data_regex.findall(r.content.strip())
+    data = {'latestData': {'uiData': {}}}
+    for x in matches:
+        data['latestData']['uiData'][x[0]] = x[1].strip("'")
+    return data
 
 d = Data(get_data())
 session.add(d)
